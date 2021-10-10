@@ -12,6 +12,11 @@
 # grayscale only is because of the space requirment for the integral image).
 
 import sensor, time, image
+import pyb
+from machine import Pin
+
+# Setup output pin
+p = Pin('PA8', mode=Pin.OUT_PP)
 
 # Reset sensor
 sensor.reset()
@@ -47,6 +52,13 @@ while (True):
     for r in objects:
         print(r)
         img.draw_rectangle(r)
+        p.high()
+
+        print("p.high()")
+        pyb.delay(1000)
+    print("P.low()")
+    p.low()
+
 
     # Print FPS.
     # Note: Actual FPS is higher, streaming the FB makes it slower.
