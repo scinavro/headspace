@@ -9,7 +9,7 @@
 
 #include "Adafruit_ThinkInk.h"
 
-#define DELAY 0
+#define DELAY 200
 #define COLOR1 EPD_BLACK
 #define COLOR2 EPD_WHITE
 
@@ -74,12 +74,7 @@ ThinkInk_290_Mono_M06 display_6(EPD_DC_6, EPD_RESET, EPD_CS_6, SRAM_CS, EPD_BUSY
 //ThinkInk_290_Tricolor_Z13 display(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
 
 
-void setup() {
-  Serial.begin(115200);
-  //while (!Serial) { delay(10); }
-  Serial.println("2.13 inch EInk Featherwing test");
-  
-//  display.begin();
+void setup() {  
   display_1.begin();
   display_2.begin();
   display_3.begin();
