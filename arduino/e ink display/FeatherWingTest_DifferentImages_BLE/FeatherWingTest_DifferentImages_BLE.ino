@@ -7,32 +7,33 @@
   MIT license, all text above must be included in any redistribution
  ****************************************************/
 
+#include <ArduinoBLE.h>
 #include "Adafruit_ThinkInk.h"
 #include "imageArray.h"
 
-#define DELAY 200
+#define DELAY 500
 
 #define SRAM_CS     -1
-#define EPD_RESET   6
-#define EPD_BUSY    7
+#define EPD_RESET   5
+#define EPD_BUSY    10
 
-#define EPD_CS_1      16
-#define EPD_DC_1      15
+#define EPD_CS_1      14
+#define EPD_DC_1      13
 
-#define EPD_CS_2      1
-#define EPD_DC_2      0
+#define EPD_CS_2      6
+#define EPD_DC_2      7
 
-#define EPD_CS_3      3
-#define EPD_DC_3      2
+#define EPD_CS_3      11
+#define EPD_DC_3      12
 
-#define EPD_CS_4      5
-#define EPD_DC_4      4
+#define EPD_CS_4      4
+#define EPD_DC_4      3
 
-#define EPD_CS_5      13
-#define EPD_DC_5      14
+#define EPD_CS_5      2
+#define EPD_DC_5      1
 
-#define EPD_CS_6      11
-#define EPD_DC_6      12
+#define EPD_CS_6      16
+#define EPD_DC_6      15
 
 // Uncomment the following line if you are using 2.13" Monochrome EPD with SSD1680
 //ThinkInk_213_Mono_BN display(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
@@ -72,6 +73,10 @@ ThinkInk_290_Mono_M06 display_6(EPD_DC_6, EPD_RESET, EPD_CS_6, SRAM_CS, EPD_BUSY
 // Uncomment the following line if you are using 2.9" Tri-Color EPD with UC8151D
 //ThinkInk_290_Tricolor_Z13 display(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
 
+BLEService einkService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Service
+// BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
+BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
+
 
 const int WIDTH = 128;
 const int HEIGHT = 296;
@@ -88,7 +93,30 @@ unsigned char image_bits_headspace6 [WIDTH*HEIGHT];
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial);  
+  while (!Serial);
+  
+  if (!BLE.begin()) {
+    Serial.println("starting BLE failed!");
+    while (1);
+  }
+  
+  // set advertised local name and service UUID:
+  BLE.setLocalName("e-ink display");
+  BLE.setAdvertisedService(einkService);
+  
+  // add the characteristic to the service
+  einkService.addCharacteristic(switchCharacteristic);
+  // add service
+  BLE.addService(einkService);
+
+  // set the initial value for the characeristic:
+  switchCharacteristic.writeValue(0);
+
+  // start advertising
+  BLE.advertise();
+  
+  Serial.println("BLE Setup Ready");
+  
   
   display_1.begin();
   display_2.begin();
@@ -122,7 +150,6 @@ void setup() {
 
   Serial.println("Display Setup Ready");
 
-  //decode a byte into 8 bits
   for(int i = 0; i < sizeof(epd_bitmap_headspace1)*8; i++){
     image_bits_headspace1[i] = ((0b10000000 >> (i % 8)) & (epd_bitmap_headspace1[i/8])) >> (7 - i % 8);
   }
@@ -146,65 +173,89 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("hello");
   display_1.clearBuffer();
   display_2.clearBuffer();
   display_3.clearBuffer();
   display_4.clearBuffer();
   display_5.clearBuffer();
   display_6.clearBuffer();
-    
-  display_1.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-  display_2.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-  display_3.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-  display_4.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-  display_5.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-  display_6.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
   
-  for(int i = 0; i < WIDTH*HEIGHT; i++){
-    int x = i % WIDTH;
-    int y = i / WIDTH;
-    if(image_bits_headspace1[i] == 1){
-      display_1.writePixel(x, y, COLOR2);
-    }
-  }
-  for(int i = 0; i < WIDTH*HEIGHT; i++){
-    int x = i % WIDTH;
-    int y = i / WIDTH;
-    if(image_bits_headspace2[i] == 1){
-      display_2.writePixel(x, y, COLOR2);
-    }
-  }
-  for(int i = 0; i < WIDTH*HEIGHT; i++){
-    int x = i % WIDTH;
-    int y = i / WIDTH;
-    if(image_bits_headspace3[i] == 1){
-      display_3.writePixel(x, y, COLOR2);
-    }
-  }
-    for(int i = 0; i < WIDTH*HEIGHT; i++){
-    int x = i % WIDTH;
-    int y = i / WIDTH;
-    if(image_bits_headspace4[i] == 1){
-      display_4.writePixel(x, y, COLOR2);
-    }
-  }
-    for(int i = 0; i < WIDTH*HEIGHT; i++){
-    int x = i % WIDTH;
-    int y = i / WIDTH;
-    if(image_bits_headspace5[i] == 1){
-      display_5.writePixel(x, y, COLOR2);
-    }
-  }
-    for(int i = 0; i < WIDTH*HEIGHT; i++){
-    int x = i % WIDTH;
-    int y = i / WIDTH;
-    if(image_bits_headspace6[i] == 1){
-      display_6.writePixel(x, y, COLOR2);
-    }
-  }
+  // listen for BLE peripherals to connect:
+  BLEDevice central = BLE.central();
   
 
+  if (central) {
+    Serial.print("Connected to central: ");
+    // print the central's MAC address:
+    Serial.println(central.address());
+
+  // while the central is still connected to peripheral:
+ 
+    // if the remote device wrote to the characteristic,
+    // use the value to control the LED:
+    if (switchCharacteristic.written()) {
+      if (switchCharacteristic.value()) {   // any value other than 0
+        Serial.println("Input A");
+        COLOR1 = EPD_WHITE;
+        COLOR2 = EPD_BLACK; // will invert the color
+      } else {                              // a 0 value
+        Serial.println(F("Input B")); 
+        COLOR1 = EPD_BLACK;
+        COLOR2 = EPD_WHITE;// will invert the color
+      }
+    }
+    
+      display_1.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+      display_2.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+      display_3.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+      display_4.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+      display_5.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+      display_6.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+      
+      for(int i = 0; i < WIDTH*HEIGHT; i++){
+        int x = i % WIDTH;
+        int y = i / WIDTH;
+        if(image_bits_headspace1[i] == 1){
+          display_1.writePixel(x, y, COLOR2);
+        }
+      }
+      for(int i = 0; i < WIDTH*HEIGHT; i++){
+        int x = i % WIDTH;
+        int y = i / WIDTH;
+        if(image_bits_headspace2[i] == 1){
+          display_2.writePixel(x, y, COLOR2);
+        }
+      }
+      for(int i = 0; i < WIDTH*HEIGHT; i++){
+        int x = i % WIDTH;
+        int y = i / WIDTH;
+        if(image_bits_headspace3[i] == 1){
+          display_3.writePixel(x, y, COLOR2);
+        }
+      }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+        int x = i % WIDTH;
+        int y = i / WIDTH;
+        if(image_bits_headspace4[i] == 1){
+          display_4.writePixel(x, y, COLOR2);
+        }
+      }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+        int x = i % WIDTH;
+        int y = i / WIDTH;
+        if(image_bits_headspace5[i] == 1){
+          display_5.writePixel(x, y, COLOR2);
+        }
+      }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+        int x = i % WIDTH;
+        int y = i / WIDTH;
+        if(image_bits_headspace6[i] == 1){
+          display_6.writePixel(x, y, COLOR2);
+        }
+      }
+  }
+  
   display_1.display();
   delay(DELAY);
   display_2.display();
@@ -217,8 +268,4 @@ void loop() {
   delay(DELAY);
   display_6.display();
   delay(DELAY);
-
-  int temp = COLOR1;
-  COLOR1 = COLOR2;
-  COLOR2 = temp;
 }
