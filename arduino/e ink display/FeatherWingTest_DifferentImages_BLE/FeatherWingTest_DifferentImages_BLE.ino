@@ -11,26 +11,26 @@
 #include "Adafruit_ThinkInk.h"
 #include "imageArray.h"
 
-#define DELAY 500
+#define DELAY 200
 
 #define SRAM_CS     -1
-#define EPD_RESET   5
-#define EPD_BUSY    10
+#define EPD_RESET   6
+#define EPD_BUSY    7
 
-#define EPD_CS_1      14
-#define EPD_DC_1      13
+#define EPD_CS_1      11
+#define EPD_DC_1      12
 
-#define EPD_CS_2      6
-#define EPD_DC_2      7
+#define EPD_CS_2      13
+#define EPD_DC_2      14
 
-#define EPD_CS_3      11
-#define EPD_DC_3      12
+#define EPD_CS_3      5
+#define EPD_DC_3      4
 
-#define EPD_CS_4      4
-#define EPD_DC_4      3
+#define EPD_CS_4      3
+#define EPD_DC_4      2
 
-#define EPD_CS_5      2
-#define EPD_DC_5      1
+#define EPD_CS_5      1
+#define EPD_DC_5      0
 
 #define EPD_CS_6      16
 #define EPD_DC_6      15
@@ -125,12 +125,12 @@ void setup() {
   display_5.begin();
   display_6.begin();
 
-  display_1.setRotation(1);
-  display_2.setRotation(1);
-  display_3.setRotation(1);
-  display_4.setRotation(1);
-  display_5.setRotation(1);
-  display_6.setRotation(1);
+  display_1.setRotation(3);
+  display_2.setRotation(3);
+  display_3.setRotation(3);
+  display_4.setRotation(3);
+  display_5.setRotation(3);
+  display_6.setRotation(3);
 
 #if defined(FLEXIBLE_213) || defined(FLEXIBLE_290)
   // The flexible displays have different buffers and invert settings!

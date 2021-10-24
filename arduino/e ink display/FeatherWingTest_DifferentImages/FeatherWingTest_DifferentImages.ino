@@ -16,23 +16,23 @@
 #define EPD_RESET   6
 #define EPD_BUSY    7
 
-#define EPD_CS_1      16
-#define EPD_DC_1      15
+#define EPD_CS_1      11
+#define EPD_DC_1      12
 
-#define EPD_CS_2      1
-#define EPD_DC_2      0
+#define EPD_CS_2      13
+#define EPD_DC_2      14
 
-#define EPD_CS_3      3
-#define EPD_DC_3      2
+#define EPD_CS_3      5
+#define EPD_DC_3      4
 
-#define EPD_CS_4      5
-#define EPD_DC_4      4
+#define EPD_CS_4      3
+#define EPD_DC_4      2
 
-#define EPD_CS_5      13
-#define EPD_DC_5      14
+#define EPD_CS_5      1
+#define EPD_DC_5      0
 
-#define EPD_CS_6      11
-#define EPD_DC_6      12
+#define EPD_CS_6      16
+#define EPD_DC_6      15
 
 // Uncomment the following line if you are using 2.13" Monochrome EPD with SSD1680
 //ThinkInk_213_Mono_BN display(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
@@ -97,12 +97,12 @@ void setup() {
   display_5.begin();
   display_6.begin();
 
-  display_1.setRotation(1);
-  display_2.setRotation(1);
-  display_3.setRotation(1);
-  display_4.setRotation(1);
-  display_5.setRotation(1);
-  display_6.setRotation(1);
+  display_1.setRotation(3);
+  display_2.setRotation(3);
+  display_3.setRotation(3);
+  display_4.setRotation(3);
+  display_5.setRotation(3);
+  display_6.setRotation(3);
 
 #if defined(FLEXIBLE_213) || defined(FLEXIBLE_290)
   // The flexible displays have different buffers and invert settings!
@@ -146,7 +146,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("hello");
   display_1.clearBuffer();
   display_2.clearBuffer();
   display_3.clearBuffer();
