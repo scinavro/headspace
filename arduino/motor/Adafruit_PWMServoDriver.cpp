@@ -37,7 +37,7 @@
  * TwoWire interface
  */
 Adafruit_PWMServoDriver::Adafruit_PWMServoDriver()
-: _i2caddr(PCA9685_I2C_ADDRESS), _i2c(&Wire), st(millis()), gap(500), on({true,false,false,false,false,false}), servomax(600), servomin(150), step(2), forward({true, true, true, true, true,true})  {}
+: _i2caddr(PCA9685_I2C_ADDRESS), _i2c(&Wire), st(millis()), gap(500), on({true,false,false,false,false,false}), servomax(225), servomin(180), step(2), forward({true, true, true, true, true,true})  {}
 
 /*!
  *  @brief  Instantiates a new PCA9685 PWM driver chip with the I2C address on a
@@ -430,12 +430,12 @@ void Adafruit_PWMServoDriver::convert_check(int no)
 {
   if (forward[no])
   {
-    if (getPulse(no) > servomax)
+    if (getPulse(no) >= servomax-5)
           forward[no] = false;
   }
   else
   {
-    if (getPulse(no) < servomin)
+    if (getPulse(no) <= servomin+5)
           forward[no] = true;
   }
 }
