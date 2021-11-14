@@ -1,5 +1,5 @@
-#ifndef imageArray_h
-#define imageArray_h
+#ifndef whiteArray_h
+#define whiteArray_h
 
 extern const unsigned char epd_bitmap_headspace1[296 * (128 / 8)];
 extern const unsigned char epd_bitmap_headspace2[296 * (128 / 8)];

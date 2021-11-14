@@ -9,7 +9,8 @@
 
 #include <ArduinoBLE.h>
 #include "Adafruit_ThinkInk.h"
-#include "imageArray.h"
+#include "whiteArray.h"
+//#include "titleArray.h"
 
 #define DELAY 200
 
@@ -17,8 +18,8 @@
 #define EPD_RESET   6
 #define EPD_BUSY    7
 
-#define EPD_CS_1      11
-#define EPD_DC_1      12
+#define EPD_CS_1      A3
+#define EPD_DC_1      A2
 
 #define EPD_CS_2      13
 #define EPD_DC_2      14
@@ -32,8 +33,8 @@
 #define EPD_CS_5      1
 #define EPD_DC_5      0
 
-#define EPD_CS_6      16
-#define EPD_DC_6      15
+#define EPD_CS_6      A1
+#define EPD_DC_6      A0
 
 // Uncomment the following line if you are using 2.13" Monochrome EPD with SSD1680
 //ThinkInk_213_Mono_BN display(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
@@ -92,6 +93,7 @@ unsigned char image_bits_headspace5 [WIDTH*HEIGHT];
 unsigned char image_bits_headspace6 [WIDTH*HEIGHT];
 
 void setup() {
+  bootM4();
   Serial.begin(9600);
   while (!Serial);
   
@@ -180,6 +182,58 @@ void loop() {
   display_5.clearBuffer();
   display_6.clearBuffer();
   
+//        Serial.println("Title");
+//        display_1.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+//        display_2.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+//        display_3.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+//        display_4.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+//        display_5.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+//        display_6.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+//        
+//        for(int i = 0; i < WIDTH*HEIGHT; i++){
+//          int x = i % WIDTH;
+//          int y = i / WIDTH;
+//          if(epd_bitmap_1[i] == 1){
+//            display_1.writePixel(x, y, COLOR2);
+//          }
+//        }
+//        for(int i = 0; i < WIDTH*HEIGHT; i++){
+//          int x = i % WIDTH;
+//          int y = i / WIDTH;
+//          if(epd_bitmap_2[i] == 1){
+//            display_2.writePixel(x, y, COLOR2);
+//          }
+//        }
+//        for(int i = 0; i < WIDTH*HEIGHT; i++){
+//          int x = i % WIDTH;
+//          int y = i / WIDTH;
+//          if(epd_bitmap_3[i] == 1){
+//            display_3.writePixel(x, y, COLOR2);
+//          }
+//        }
+//          for(int i = 0; i < WIDTH*HEIGHT; i++){
+//          int x = i % WIDTH;
+//          int y = i / WIDTH;
+//          if(epd_bitmap_4[i] == 1){
+//            display_4.writePixel(x, y, COLOR2);
+//          }
+//        }
+//          for(int i = 0; i < WIDTH*HEIGHT; i++){
+//          int x = i % WIDTH;
+//          int y = i / WIDTH;
+//          if(epd_bitmap_5[i] == 1){
+//            display_5.writePixel(x, y, COLOR2);
+//          }
+//        }
+//          for(int i = 0; i < WIDTH*HEIGHT; i++){
+//          int x = i % WIDTH;
+//          int y = i / WIDTH;
+//          if(epd_bitmap_6[i] == 1){
+//            display_6.writePixel(x, y, COLOR2);
+//          }
+//        }
+      
+  
   // listen for BLE peripherals to connect:
   BLEDevice central = BLE.central();
   
@@ -194,66 +248,126 @@ void loop() {
     // if the remote device wrote to the characteristic,
     // use the value to control the LED:
     if (switchCharacteristic.written()) {
-      if (switchCharacteristic.value()) {   // any value other than 0
+      if (switchCharacteristic.value()==0) {   // any value other than 0
         Serial.println("Input A");
-        COLOR1 = EPD_WHITE;
-        COLOR2 = EPD_BLACK; // will invert the color
-      } else {                              // a 0 value
-        Serial.println(F("Input B")); 
-        COLOR1 = EPD_BLACK;
-        COLOR2 = EPD_WHITE;// will invert the color
+        display_1.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+        display_2.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+        display_3.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+        display_4.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+        display_5.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+        display_6.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
+        
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace1[i] == 1){
+            display_1.writePixel(x, y, COLOR2);
+          }
+        }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace2[i] == 1){
+            display_2.writePixel(x, y, COLOR2);
+          }
+        }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace3[i] == 1){
+            display_3.writePixel(x, y, COLOR2);
+          }
+        }
+          for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace4[i] == 1){
+            display_4.writePixel(x, y, COLOR2);
+          }
+        }
+          for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace5[i] == 1){
+            display_5.writePixel(x, y, COLOR2);
+          }
+        }
+          for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace6[i] == 1){
+            display_6.writePixel(x, y, COLOR2);
+          }
+        }
+      } else if (switchCharacteristic.value()==1) {                              // a 0 value
+        Serial.println("Input B");
+        display_1.fillRect(0, 0, WIDTH, HEIGHT, COLOR2);
+        display_2.fillRect(0, 0, WIDTH, HEIGHT, COLOR2);
+        display_3.fillRect(0, 0, WIDTH, HEIGHT, COLOR2);
+        display_4.fillRect(0, 0, WIDTH, HEIGHT, COLOR2);
+        display_5.fillRect(0, 0, WIDTH, HEIGHT, COLOR2);
+        display_6.fillRect(0, 0, WIDTH, HEIGHT, COLOR2);
+        
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace1[i] == 1){
+            display_1.writePixel(x, y, COLOR1);
+          }
+        }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace2[i] == 1){
+            display_2.writePixel(x, y, COLOR1);
+          }
+        }
+        for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace3[i] == 1){
+            display_3.writePixel(x, y, COLOR1);
+          }
+        }
+          for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace4[i] == 1){
+            display_4.writePixel(x, y, COLOR1);
+          }
+        }
+          for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace5[i] == 1){
+            display_5.writePixel(x, y, COLOR1);
+          }
+        }
+          for(int i = 0; i < WIDTH*HEIGHT; i++){
+          int x = i % WIDTH;
+          int y = i / WIDTH;
+          if(image_bits_headspace6[i] == 1){
+            display_6.writePixel(x, y, COLOR1);
+          }
+        }
       }
+        display_1.display();
+        delay(DELAY);
+        display_2.display();
+        delay(DELAY);
+        display_3.display();
+        delay(DELAY);
+        display_4.display();
+        delay(DELAY);
+        display_5.display();
+        delay(DELAY);
+        display_6.display();
+        delay(DELAY);
     }
     
-      display_1.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-      display_2.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-      display_3.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-      display_4.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-      display_5.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
-      display_6.fillRect(0, 0, WIDTH, HEIGHT, COLOR1);
       
-      for(int i = 0; i < WIDTH*HEIGHT; i++){
-        int x = i % WIDTH;
-        int y = i / WIDTH;
-        if(image_bits_headspace1[i] == 1){
-          display_1.writePixel(x, y, COLOR2);
-        }
-      }
-      for(int i = 0; i < WIDTH*HEIGHT; i++){
-        int x = i % WIDTH;
-        int y = i / WIDTH;
-        if(image_bits_headspace2[i] == 1){
-          display_2.writePixel(x, y, COLOR2);
-        }
-      }
-      for(int i = 0; i < WIDTH*HEIGHT; i++){
-        int x = i % WIDTH;
-        int y = i / WIDTH;
-        if(image_bits_headspace3[i] == 1){
-          display_3.writePixel(x, y, COLOR2);
-        }
-      }
-        for(int i = 0; i < WIDTH*HEIGHT; i++){
-        int x = i % WIDTH;
-        int y = i / WIDTH;
-        if(image_bits_headspace4[i] == 1){
-          display_4.writePixel(x, y, COLOR2);
-        }
-      }
-        for(int i = 0; i < WIDTH*HEIGHT; i++){
-        int x = i % WIDTH;
-        int y = i / WIDTH;
-        if(image_bits_headspace5[i] == 1){
-          display_5.writePixel(x, y, COLOR2);
-        }
-      }
-        for(int i = 0; i < WIDTH*HEIGHT; i++){
-        int x = i % WIDTH;
-        int y = i / WIDTH;
-        if(image_bits_headspace6[i] == 1){
-          display_6.writePixel(x, y, COLOR2);
-        }
-      }
+  } else {
+    Serial.println("Connection lost");
   }
   
   display_1.display();
